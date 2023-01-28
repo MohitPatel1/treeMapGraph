@@ -3,8 +3,8 @@ console.log(urlParams.get("data"))
 const dataParams = {
     movies :{
         fetch_url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json',
-        title: "top 100 movies",
-        description: "good movies"
+        title: "Movie Sales",
+        description: "Top 100 Highest Grossing Movies Grouped By Genre"
     },
     kickstart : {
         fetch_url : 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json',
@@ -13,8 +13,8 @@ const dataParams = {
     },
     videogames : {
         fetch_url : 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json',
-        title: "top 100 videogames",
-        description: "good videogames"
+        title: "Video Game Sales",
+        description: "Top 100 Most Sold Video Games Grouped by Platform"
     }
 }
 
@@ -35,16 +35,14 @@ const fillContent = async () => {
     document.getElementById("description").innerText = dataToLoad.description;
     
     let width = 0.9 * window.innerWidth;
-    let height = 0.8 * window.innerHeight;
+    let height = 0.7 * window.innerHeight;
     let padding = 40;
     // console.log({data})
     
 
-    const graph = d3.select("h2")
-    .append('svg')
+    const graph = d3.select("#tree-map")
     .attr('height',height)
     .attr('width',width)
-    .attr('fill','serie')
 
     const tooltip = document.getElementById("tooltip")
 
@@ -87,8 +85,7 @@ const fillContent = async () => {
 
     let tile = cell.append("rect")
     .attr('class','tile')
-    // .attr('data-catagory',d=>console.log(d.data.name.split(/(?=[A-Z][^A-Z])/)))
-    .attr('data-catagory',d=>d.data.category)
+    .attr('data-category',d=>d.data.category)
     .attr('data-name',d=>d.data.name)
     .attr('data-value',d=>d.data.value)
     .attr('id',d=>d.data.id)
@@ -99,7 +96,7 @@ const fillContent = async () => {
         tooltip.classList.add("show")
         tooltip.style.left=(i.pageX+10)+"px";
         tooltip.style.top=(i.pageY+10)+"px";
-        tooltip.setAttribute('data-date',d[0]);
+        tooltip.setAttribute('data-value',d.data.value);
         tooltip.innerHTML = (`Name${d.data.name}<br>Category:${d.data.category}<br>Value:${d.data.value}`)
     })
 
@@ -110,7 +107,6 @@ const fillContent = async () => {
 
     cell.append("text")
     .selectAll("tspan")
-    // .data(d=>d.data.name.split(/(?=[A-Z][^A-Z])/g))
     .data(d=>d.data.name.split(/(?=[A-Z][^A-Z])/)) // split from capital letters in which next letter is not capital, World War II => II will not be devided
     .enter()
     .append("tspan")
@@ -119,7 +115,29 @@ const fillContent = async () => {
     .attr('y',(d,i)=>12+i*10)
     .text(d=>d)
 
+    let categories = root.leaves().map(d => d.data.category).filter((d,i,self)=>self.indexOf(d) === i);
+    console.log(categories)
     
+    let legend = d3.select('#legend')
+    .attr('width',490)
+    .append('g')
+    .attr('transform','translate(20,20)')
+    .selectAll('g')
+    .data(categories)
+    .enter()
+    .append('g')
+    .attr('transform',(d,i)=>`translate(${(i%3)*150},${(Math.floor(i/3))*25+25})`)
+
+    legend.append('rect')
+    .attr('width',15)
+    .attr('height',15)
+    .attr('fill',d=>color(d))
+    .attr('class','legend-item')
+
+    legend.append('text')
+    .attr('x',(d,i)=> (i%3)*15 + 20)
+    .attr('y',(d,i)=> ((Math.floor(i/3))*5)+10)
+    .text(d=>d)
 
 }
     window.addEventListener('DOMContentLoaded', fillContent)

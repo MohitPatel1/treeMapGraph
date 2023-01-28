@@ -2,8 +2,14 @@ body{
     text-align: center;
 }
 
-.tooltip{
-    z-index: 5;
+a{
+    margin: 0 50px;
+    font-size: large;
+}
+
+#tree-map{
+    font-weight: 500;
+    font-size: 15px;
 }
 
 #tooltip{
