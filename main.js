@@ -40,13 +40,15 @@ const fillContent = async () => {
     // console.log({data})
     
 
-    const graph = d3.select("div")
+    const graph = d3.select("h2")
     .append('svg')
     .attr('height',height)
     .attr('width',width)
     .attr('fill','serie')
 
-    const treemap = d3.treemap().size([width,height]).padding(1)
+    const tooltip = document.getElementById("tooltip")
+
+    const treemap = d3.treemap().size([width,height]).padding(0.5)
     const root = d3.hierarchy(data).sum((d)=>d.value)
     console.log(d3.hierarchy(data))
     console.log(root)
@@ -85,7 +87,7 @@ const fillContent = async () => {
 
     let tile = cell.append("rect")
     .attr('class','tile')
-    .attr('data-catagory',d=>console.log(`${color(d.data.category)}`))
+    // .attr('data-catagory',d=>console.log(d.data.name.split(/(?=[A-Z][^A-Z])/)))
     .attr('data-catagory',d=>d.data.category)
     .attr('data-name',d=>d.data.name)
     .attr('data-value',d=>d.data.value)
@@ -93,7 +95,31 @@ const fillContent = async () => {
     .attr('width',d=>(d.x1 - d.x0))
     .attr('height',d=>(d.y1 - d.y0))
     .attr('fill',d => `${color(d.data.category)}`)
+    .on("mouseover",(i,d)=>{
+        tooltip.classList.add("show")
+        tooltip.style.left=(i.pageX+10)+"px";
+        tooltip.style.top=(i.pageY+10)+"px";
+        tooltip.setAttribute('data-date',d[0]);
+        tooltip.innerHTML = (`Name${d.data.name}<br>Category:${d.data.category}<br>Value:${d.data.value}`)
+    })
 
+    .on("mouseout",()=>{
+        tooltip.classList.remove("show")
+    })
+
+
+    cell.append("text")
+    .selectAll("tspan")
+    // .data(d=>d.data.name.split(/(?=[A-Z][^A-Z])/g))
+    .data(d=>d.data.name.split(/(?=[A-Z][^A-Z])/)) // split from capital letters in which next letter is not capital, World War II => II will not be devided
+    .enter()
+    .append("tspan")
+    .style("font-size",12)
+    .attr('x',5)
+    .attr('y',(d,i)=>12+i*10)
+    .text(d=>d)
+
+    
 
 }
     window.addEventListener('DOMContentLoaded', fillContent)

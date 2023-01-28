@@ -1,3 +1,21 @@
 body{
     text-align: center;
 }
+
+.tooltip{
+    z-index: 5;
+}
+
+#tooltip{
+    position:absolute;
+    color: azure;
+    padding: 6px;
+    background-color: rgba(194, 108, 4, 0.703);
+    font-size: 15px;
+    display: none;
+    border-radius: 4px;
+  }
+  
+  #tooltip.show{
+    display: flex;
+  }
