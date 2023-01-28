@@ -30,7 +30,6 @@ const getData = async (dataUrl) => {
 
 
 const fillContent = async () => {
-    console.log(dataToLoad['fetch_url'])
     const data = await getData(dataToLoad.fetch_url);
     document.getElementById("title").innerText = dataToLoad.title;
     document.getElementById("description").innerText = dataToLoad.description;
@@ -38,14 +37,62 @@ const fillContent = async () => {
     let width = 0.9 * window.innerWidth;
     let height = 0.8 * window.innerHeight;
     let padding = 40;
-    console.log({data})
+    // console.log({data})
     
 
-    const graph = d3.select("h2")
+    const graph = d3.select("div")
     .append('svg')
     .attr('height',height)
     .attr('width',width)
-    .attr('fill','green')
+    .attr('fill','serie')
+
+    const treemap = d3.treemap().size([width,height]).padding(1)
+    const root = d3.hierarchy(data).sum((d)=>d.value)
+    console.log(d3.hierarchy(data))
+    console.log(root)
+
+    treemap(root);
+
+    const color = d3.scaleOrdinal(
+        [
+          '#1f77b4',
+          '#aec7e8',
+          '#ff7f0e',
+          '#ffbb78',
+          '#2ca02c',
+          '#98df8a',
+          '#d62728',
+          '#ff9896',
+          '#9467bd',
+          '#c5b0d5',
+          '#8c564b',
+          '#c49c94',
+          '#e377c2',
+          '#f7b6d2',
+          '#7f7f7f',
+          '#c7c7c7',
+          '#bcbd22',
+          '#dbdb8d',
+          '#17becf',
+          '#9edae5'
+        ]);
+
+    const cell = graph.selectAll('g')
+    .data(root.leaves())
+    .enter()
+    .append('g')
+    .attr('transform',(d)=>`translate(${d.x0},${d.y0})`)
+
+    let tile = cell.append("rect")
+    .attr('class','tile')
+    .attr('data-catagory',d=>console.log(`${color(d.data.category)}`))
+    .attr('data-catagory',d=>d.data.category)
+    .attr('data-name',d=>d.data.name)
+    .attr('data-value',d=>d.data.value)
+    .attr('id',d=>d.data.id)
+    .attr('width',d=>(d.x1 - d.x0))
+    .attr('height',d=>(d.y1 - d.y0))
+    .attr('fill',d => `${color(d.data.category)}`)
 
 
 }
